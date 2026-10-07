@@ -1,0 +1,64 @@
+name: Deploy TSC Attivazione
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verifica configurazione TSC
+        shell: bash
+        env:
+          TSC_URL: ${{ vars.TSC_SUPABASE_URL }}
+          TSC_KEY: ${{ vars.TSC_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$TSC_URL" ]; then
+            echo "::error::Manca la variabile TSC_SUPABASE_URL"
+            exit 1
+          fi
+          if [ -z "$TSC_KEY" ]; then
+            echo "::error::Manca la variabile TSC_SUPABASE_PUBLISHABLE_KEY"
+            exit 1
+          fi
+
+      - name: Prepara sito
+        shell: bash
+        env:
+          TSC_URL: ${{ vars.TSC_SUPABASE_URL }}
+          TSC_KEY: ${{ vars.TSC_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          mkdir -p _site
+          cp index.html app.js _site/
+          printf 'window.TSC_CONFIG = {\n  supabaseUrl: "%s",\n  supabasePublishableKey: "%s"\n};\n' "$TSC_URL" "$TSC_KEY" > _site/config.js
+
+      - name: Configura GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Carica sito
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Pubblica sito
+        id: deployment
+        uses: actions/deploy-pages@v4
