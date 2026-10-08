@@ -7,6 +7,10 @@
   const password = document.getElementById("password");
   const passwordConfirm = document.getElementById("passwordConfirm");
   const submitBtn = document.getElementById("submitBtn");
+  const formTitle = document.getElementById("formTitle");
+  const formIntro = document.getElementById("formIntro");
+  const successTitle = document.getElementById("successTitle");
+  const successText = document.getElementById("successText");
 
   function showError(message) {
     status.className = "status error";
@@ -50,6 +54,21 @@
 
       const accessToken = hash.get("access_token");
       const refreshToken = hash.get("refresh_token");
+      const authType =
+        hash.get("type") ||
+        query.get("type") ||
+        "invite";
+      const isRecovery = authType === "recovery";
+
+      if (isRecovery) {
+        formTitle.textContent = "Reimposta la password";
+        formIntro.textContent =
+          "Scegli una nuova password per il tuo account TSC.";
+        submitBtn.textContent = "Salva nuova password";
+        successTitle.textContent = "Password reimpostata";
+        successText.textContent =
+          "La nuova password è stata salvata correttamente. Puoi chiudere questa pagina e accedere all'app TSC.";
+      }
 
       if (!accessToken || !refreshToken) {
         throw new Error(
@@ -87,7 +106,8 @@
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "Attivazione…";
+        submitBtn.textContent =
+          isRecovery ? "Salvataggio…" : "Attivazione…";
 
         const { error } = await client.auth.updateUser({
           password: password.value,
@@ -95,7 +115,8 @@
 
         if (error) {
           submitBtn.disabled = false;
-          submitBtn.textContent = "Attiva account";
+          submitBtn.textContent =
+            isRecovery ? "Salva nuova password" : "Salva password";
           showError(error.message || "Impossibile impostare la password.");
           return;
         }
@@ -104,7 +125,11 @@
 
         formBox.classList.add("hidden");
         successBox.classList.remove("hidden");
-        showOk("Attivazione completata.");
+        showOk(
+          isRecovery
+            ? "Reimpostazione completata."
+            : "Attivazione completata."
+        );
       });
     } catch (error) {
       loading.classList.add("hidden");
