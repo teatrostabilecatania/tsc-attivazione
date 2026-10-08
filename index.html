@@ -72,8 +72,8 @@
       </div>
 
       <div id="formBox" class="hidden">
-        <h1>Imposta la password</h1>
-        <p>Scegli la password che userai per accedere alle applicazioni TSC.</p>
+        <h1 id="formTitle">Imposta la password</h1>
+        <p id="formIntro">Scegli la password che userai per accedere alle applicazioni TSC.</p>
         <form id="passwordForm">
           <label>
             Nuova password
@@ -84,13 +84,13 @@
             <input id="passwordConfirm" type="password" minlength="8" autocomplete="new-password" required>
           </label>
           <p class="muted" style="margin-top:10px">Usa almeno 8 caratteri.</p>
-          <button id="submitBtn" type="submit">Attiva account</button>
+          <button id="submitBtn" type="submit">Salva password</button>
         </form>
       </div>
 
       <div id="successBox" class="hidden">
-        <h1>Account attivato</h1>
-        <p>La password è stata impostata correttamente. Puoi chiudere questa pagina e accedere all'app TSC con la tua email.</p>
+        <h1 id="successTitle">Password impostata</h1>
+        <p id="successText">La password è stata impostata correttamente. Puoi chiudere questa pagina e accedere all'app TSC con la tua email.</p>
       </div>
 
       <div id="status" class="status" role="status" aria-live="polite"></div>
